@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="David's Daily">
+<meta name="theme-color" content="#0e0c0a">
+<title>David's Daily · The Daily Round</title>
+<link rel="manifest" href="/manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Crimson+Text:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --gold:#b8943f;
+  --gold-dim:#8a6d2e;
+  --paper:#ddd3be;
+  --paper-dim:#a89880;
+  --ink:#0e0c0a;
+  --surface:#161410;
+  --border:#252018;
+  --muted:#7a6e5d;
+  --danger:#8b3a3a;
+}
+
+body{
+  background:var(--ink);
+  color:var(--paper);
+  font-family:'Crimson Text',Georgia,serif;
+  font-size:18px;
+  line-height:1.55;
+  min-height:100vh;
+}
+
+/* ── TOPBAR ── */
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:18px 36px;
+  border-bottom:1px solid var(--border);
+  flex-wrap:wrap;
+  gap:12px;
+}
+.wordmark{
+  font-family:'Playfair Display',Georgia,serif;
+  font-size:0.82rem;
+  letter-spacing:0.22em;
+  text-transform:uppercase;
+  color:var(--gold);
+  font-weight:600;
+}
+.topright{
+  display:flex;
+  align-items:center;
+  gap:18px;
+  font-size:0.9rem;
+  color:var(--muted);
+  flex-wrap:wrap;
+}
+.weather-pill{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  border:1px solid var(--border);
+  padding:5px 14px;
+  border-radius:20px;
+  font-size:0.88rem;
+  color:var(--paper-dim);
+}
+#clock{
+  font-family:'Playfair Display',serif;
+  font-size:1rem;
+  color:var(--paper-dim);
+  letter-spacing:0.05em;
+}
+#dateline{
+  font-size:0.85rem;
+  color:var(--muted);
+}
+
+/* ── MAIN LAYOUT ── */
+.main{
+  max-width:860px;
+  margin:0 auto;
+  padding:48px 36px 80px;
+}
+
+/* ── SECTION HEADING ── */
+.section-label{
+  font-family:'Playfair Display',serif;
+  font-size:0.7rem;
+  letter-spacing:0.28em;
+  text-transform:uppercase;
+  color:var(--gold-dim);
+  margin-bottom:20px;
+}
+
+/* ── PRIORITIES ── */
+.priorities-section{margin-bottom:52px}
+
+.priority-list{
+  list-style:none;
+  margin-bottom:20px;
+}
+.priority-item{
+  display:flex;
+  align-items:flex-start;
+  gap:14px;
+  padding:14px 0;
+  border-bottom:1px solid var(--border);
+  animation:fadeIn 0.3s ease;
+}
+.priority-item:last-child{border-bottom:none}
+.priority-number{
+  font-family:'Playfair Display',serif;
+  font-size:1.4rem;
+  color:var(--gold);
+  line-height:1;
+  min-width:24px;
+  padding-top:2px;
+}
+.priority-text{
+  flex:1;
+  font-size:1.1rem;
+  color:var(--paper);
+  line-height:1.45;
+}
+.priority-text.done{
+  text-decoration:line-through;
+  color:var(--muted);
+}
+.priority-actions{
+  display:flex;
+  gap:8px;
+  flex-shrink:0;
+}
+.btn-icon{
+  background:none;
+  border:none;
+  cursor:pointer;
+  color:var(--muted);
+  font-size:1rem;
+  padding:2px 6px;
+  border-radius:4px;
+  transition:color 0.2s, background 0.2s;
+  line-height:1;
+}
+.btn-icon:hover{color:var(--paper);background:var(--border)}
+.btn-icon.done-btn:hover{color:#6ab187}
+.btn-icon.del-btn:hover{color:var(--danger)}
+
+/* Add priority */
+.add-priority{
+  display:flex;
+  gap:10px;
+  margin-top:8px;
+}
+.add-priority input{
+  flex:1;
+  background:var(--surface);
+  border:1px solid var(--border);
+  color:var(--paper);
+  font-family:'Crimson Text',serif;
+  font-size:1rem;
+  padding:10px 14px;
+  border-radius:6px;
+  outline:none;
+  transition:border-color 0.2s;
+}
+.add-priority input:focus{border-color:var(--gold-dim)}
+.add-priority input::placeholder{color:var(--muted)}
+.btn-add{
+  background:none;
+  border:1px solid var(--border);
+  color:var(--gold);
+  font-family:'Playfair Display',serif;
+  font-size:0.8rem;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  padding:10px 18px;
+  border-radius:6px;
+  cursor:pointer;
+  transition:border-color 0.2s, color 0.2s;
+  white-space:nowrap;
+}
+.btn-add:hover{border-color:var(--gold);color:var(--paper)}
+
+/* ── CARDS ROW ── */
+.cards{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+  margin-bottom:52px;
+}
+@media(max-width:600px){.cards{grid-template-columns:1fr}}
+
+.card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:22px 24px;
+}
+.card-label{
+  font-family:'Playfair Display',serif;
+  font-size:0.65rem;
+  letter-spacing:0.25em;
+  text-transform:uppercase;
+  color:var(--gold-dim);
+  margin-bottom:10px;
+}
+.card-content{
+  font-size:1rem;
+  color:var(--paper-dim);
+  line-height:1.5;
+}
+.card-content strong{color:var(--paper)}
+
+/* ── QUOTE ── */
+.quote-section{
+  border-top:1px solid var(--border);
+  padding-top:36px;
+  margin-bottom:52px;
+}
+.quote-text{
+  font-family:'Playfair Display',serif;
+  font-size:1.25rem;
+  font-style:italic;
+  color:var(--paper-dim);
+  line-height:1.6;
+  margin-bottom:12px;
+}
+.quote-attribution{
+  font-size:0.88rem;
+  color:var(--muted);
+  letter-spacing:0.05em;
+}
+.btn-quote{
+  margin-top:16px;
+  background:none;
+  border:none;
+  color:var(--muted);
+  font-size:0.82rem;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  cursor:pointer;
+  padding:0;
+  transition:color 0.2s;
+  font-family:'Playfair Display',serif;
+}
+.btn-quote:hover{color:var(--gold)}
+
+/* ── MODULES GRID ── */
+.modules-label{margin-bottom:24px}
+.modules{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+}
+@media(max-width:500px){.modules{grid-template-columns:repeat(2,1fr)}}
+
+.module{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:18px 16px;
+  cursor:pointer;
+  transition:border-color 0.2s, background 0.2s;
+  text-align:left;
+}
+.module:hover{border-color:var(--gold-dim);background:#1c1a15}
+.module.coming-soon{opacity:0.45;cursor:default}
+.module.coming-soon:hover{border-color:var(--border);background:var(--surface)}
+.module-icon{font-size:1.4rem;margin-bottom:8px}
+.module-name{
+  font-family:'Playfair Display',serif;
+  font-size:0.88rem;
+  color:var(--paper);
+  margin-bottom:2px;
+}
+.module-desc{
+  font-size:0.78rem;
+  color:var(--muted);
+  line-height:1.35;
+}
+
+/* ── SYNC STATUS ── */
+.sync-bar{
+  position:fixed;
+  bottom:0;left:0;right:0;
+  background:var(--surface);
+  border-top:1px solid var(--border);
+  padding:8px 36px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:0.78rem;
+  color:var(--muted);
+}
+.sync-dot{
+  width:7px;height:7px;
+  border-radius:50%;
+  background:var(--muted);
+  flex-shrink:0;
+  transition:background 0.4s;
+}
+.sync-dot.synced{background:#6ab187}
+.sync-dot.syncing{background:var(--gold);animation:pulse 1s infinite}
+.sync-dot.offline{background:var(--danger)}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="wordmark">David's Daily · The Daily Round</div>
+  <div class="topright">
+    <div class="weather-pill">
+      <span id="weather-icon">☁</span>
+      <span id="weather-temp">—</span>
+    </div>
+    <span id="dateline"></span>
+    <span id="clock"></span>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- PRIORITIES -->
+  <section class="priorities-section">
+    <div class="section-label">Today's Priorities</div>
+    <ul class="priority-list" id="priority-list"></ul>
+    <div class="add-priority">
+      <input type="text" id="priority-input" placeholder="Add a priority…" maxlength="120">
+      <button class="btn-add" onclick="addPriority()">Add</button>
+    </div>
+  </section>
+
+  <!-- CARDS -->
+  <div class="cards">
+    <div class="card">
+      <div class="card-label">Health Note</div>
+      <div class="card-content" id="health-note">
+        Monitor heart rate variability today. Rollator on uneven ground — slow down. Stay hydrated.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-label">The Circle</div>
+      <div class="card-content" id="relationship-nudge">
+        When did you last call <strong>Shay</strong>? A two-minute check-in today.
+      </div>
+    </div>
+  </div>
+
+  <!-- QUOTE -->
+  <section class="quote-section">
+    <div class="section-label">Today's Word</div>
+    <div class="quote-text" id="quote-text"></div>
+    <div class="quote-attribution" id="quote-attribution"></div>
+    <button class="btn-quote" onclick="nextQuote()">Another →</button>
+  </section>
+
+  <!-- MODULES -->
+  <div class="section-label modules-label">Modules</div>
+  <div class="modules" id="modules-grid"></div>
+
+</main>
+
+<!-- SYNC STATUS BAR -->
+<div class="sync-bar">
+  <div class="sync-dot" id="sync-dot"></div>
+  <span id="sync-label">Local only</span>
+</div>
+
+<script>
+// ── QUOTES ──────────────────────────────────────────────────────────────────
+const QUOTES = [
+  {t:"The most courageous act is still to think for yourself. Aloud.",a:"Coco Chanel"},
+  {t:"A writer only begins a book. A reader finishes it.",a:"Samuel Johnson"},
+  {t:"To live is so startling it leaves little time for anything else.",a:"Emily Dickinson"},
+  {t:"What we call the beginning is often the end. And to make an end is to make a beginning.",a:"T.S. Eliot"},
+  {t:"In the middle of difficulty lies opportunity.",a:"Albert Einstein"},
+  {t:"The privilege of a lifetime is to become who you truly are.",a:"Carl Jung"},
+  {t:"We are what we repeatedly do. Excellence, then, is not an act, but a habit.",a:"Aristotle"},
+  {t:"Not all those who wander are lost.",a:"J.R.R. Tolkien"},
+  {t:"The only way out of the labyrinth of suffering is to forgive.",a:"John Green"},
+  {t:"Be yourself; everyone else is already taken.",a:"Oscar Wilde"},
+  {t:"You only live once, but if you do it right, once is enough.",a:"Mae West"},
+  {t:"In the depth of winter, I finally learned that within me there lay an invincible summer.",a:"Albert Camus"},
+  {t:"It does not matter how slowly you go as long as you do not stop.",a:"Confucius"},
+  {t:"The mind is everything. What you think you become.",a:"Buddha"},
+  {t:"The best time to plant a tree was twenty years ago. The second best time is now.",a:"Chinese Proverb"},
+  {t:"Knowing yourself is the beginning of all wisdom.",a:"Aristotle"},
+  {t:"Life is what happens when you're busy making other plans.",a:"John Lennon"},
+  {t:"The journey of a thousand miles begins with one step.",a:"Lao Tzu"},
+  {t:"That which does not kill us makes us stronger.",a:"Friedrich Nietzsche"},
+  {t:"Imagination is more important than knowledge.",a:"Albert Einstein"},
+  {t:"There is no greater agony than bearing an untold story inside you.",a:"Maya Angelou"},
+  {t:"Do not go gentle into that good night. Rage, rage against the dying of the light.",a:"Dylan Thomas"},
+  {t:"We accept the love we think we deserve.",a:"Stephen Chbosky"},
+  {t:"To be is to do.",a:"Immanuel Kant"},
+  {t:"The unexamined life is not worth living.",a:"Socrates"},
+  {t:"Tell me, what is it you plan to do with your one wild and precious life?",a:"Mary Oliver"},
+  {t:"Old age is not a disease — it is strength and survivorship, triumph over all kinds of vicissitudes.",a:"Maggie Kuhn"},
+  {t:"Anyone who stops learning is old, whether at twenty or eighty.",a:"Henry Ford"},
+  {t:"Do not regret growing older. It is a privilege denied to many.",a:"Anonymous"},
+  {t:"The afternoon of life is just as full of meaning as the morning; only its meaning and purpose are different.",a:"Carl Jung"},
+  {t:"It is never too late to be what you might have been.",a:"George Eliot"},
+  {t:"We do not stop playing because we grow old; we grow old because we stop playing.",a:"George Bernard Shaw"},
+  {t:"Age is an issue of mind over matter. If you don't mind, it doesn't matter.",a:"Mark Twain"},
+  {t:"A writer must not shift your point of view.",a:"Janet Burroway"},
+  {t:"The first draft of anything is garbage.",a:"Ernest Hemingway"},
+  {t:"Write drunk, edit sober.",a:"Ernest Hemingway"},
+  {t:"There is no greater importance in all the world than kindness.",a:"Goodnight Moon"},
+  {t:"The role of a writer is not to say what we all can say, but what we are unable to say.",a:"Anaïs Nin"},
+  {t:"A good writer possesses not only his own spirit but also the spirit of his friends.",a:"Friedrich Nietzsche"},
+  {t:"You fail only if you stop writing.",a:"Ray Bradbury"},
+  {t:"If you want to be a writer, you must do two things above all others: read a lot and write a lot.",a:"Stephen King"},
+  {t:"Start writing, no matter what. The water does not flow until the faucet is turned on.",a:"Louis L'Amour"},
+  {t:"A scrupulous writer, in every sentence that he writes, will ask himself at least four questions.",a:"George Orwell"},
+  {t:"Fill your paper with the breathings of your heart.",a:"William Wordsworth"},
+  {t:"One must always be careful of bookshelves and what is on them.",a:"Cassandra Clare"},
+];
+
+let quoteIndex = 0;
+
+function todayKey(){
+  const d=new Date();
+  return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+}
+
+function loadQuoteIndex(){
+  const saved=localStorage.getItem('dd-quote-day');
+  if(saved===todayKey()){
+    quoteIndex=parseInt(localStorage.getItem('dd-quote-idx')||'0');
+  } else {
+    quoteIndex=Math.floor(Math.random()*QUOTES.length);
+    localStorage.setItem('dd-quote-day',todayKey());
+    localStorage.setItem('dd-quote-idx',quoteIndex);
+  }
+}
+
+function renderQuote(){
+  const q=QUOTES[quoteIndex%QUOTES.length];
+  document.getElementById('quote-text').textContent='\u201c'+q.t+'\u201d';
+  document.getElementById('quote-attribution').textContent='\u2014\u2009'+q.a;
+}
+
+function nextQuote(){
+  quoteIndex=(quoteIndex+1)%QUOTES.length;
+  localStorage.setItem('dd-quote-idx',quoteIndex);
+  renderQuote();
+}
+
+// ── PRIORITIES ───────────────────────────────────────────────────────────────
+let priorities=[];
+
+function prioritiesKey(){return 'dd-priorities-'+todayKey()}
+
+async function loadPriorities(){
+  // Try KV first, fall back to localStorage
+  try {
+    const res=await fetch('/api/kv?key='+prioritiesKey());
+    if(res.ok){
+      const data=await res.json();
+      if(data.value) priorities=data.value;
+      setSyncStatus('synced');
+      renderPriorities();
+      return;
+    }
+  } catch(e){}
+  // Fallback: localStorage
+  const raw=localStorage.getItem(prioritiesKey());
+  priorities=raw?JSON.parse(raw):getDefaultPriorities();
+  setSyncStatus('offline');
+  renderPriorities();
+}
+
+function getDefaultPriorities(){
+  return[
+    {id:Date.now(),text:'Write 500 words on the downsizing series',done:false},
+    {id:Date.now()+1,text:'Review Iran War Monitor briefing',done:false},
+    {id:Date.now()+2,text:'Thirty minutes of reading — no screen',done:false},
+  ];
+}
+
+async function savePriorities(){
+  localStorage.setItem(prioritiesKey(),JSON.stringify(priorities));
+  setSyncStatus('syncing');
+  try {
+    await fetch('/api/kv?key='+prioritiesKey(),{
+      method:'PUT',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({value:priorities})
+    });
+    setSyncStatus('synced');
+  } catch(e){
+    setSyncStatus('offline');
+  }
+}
+
+function renderPriorities(){
+  const ul=document.getElementById('priority-list');
+  ul.innerHTML='';
+  priorities.forEach((p,i)=>{
+    const li=document.createElement('li');
+    li.className='priority-item';
+    li.innerHTML=`
+      <span class="priority-number">${i+1}</span>
+      <span class="priority-text${p.done?' done':''}">${escHtml(p.text)}</span>
+      <span class="priority-actions">
+        <button class="btn-icon done-btn" onclick="togglePriority(${p.id})" title="Done">✓</button>
+        <button class="btn-icon del-btn" onclick="deletePriority(${p.id})" title="Remove">×</button>
+      </span>`;
+    ul.appendChild(li);
+  });
+}
+
+function addPriority(){
+  const inp=document.getElementById('priority-input');
+  const text=inp.value.trim();
+  if(!text)return;
+  priorities.push({id:Date.now(),text,done:false});
+  inp.value='';
+  renderPriorities();
+  savePriorities();
+}
+
+function togglePriority(id){
+  const p=priorities.find(x=>x.id===id);
+  if(p){p.done=!p.done;renderPriorities();savePriorities();}
+}
+
+function deletePriority(id){
+  priorities=priorities.filter(x=>x.id!==id);
+  renderPriorities();
+  savePriorities();
+}
+
+document.getElementById('priority-input').addEventListener('keydown',e=>{
+  if(e.key==='Enter')addPriority();
+});
+
+function escHtml(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── CLOCK & DATE ─────────────────────────────────────────────────────────────
+function formatDate(){
+  const d=new Date();
+  return d.toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+}
+function updateClock(){
+  const d=new Date();
+  const h=d.getHours().toString().padStart(2,'0');
+  const m=d.getMinutes().toString().padStart(2,'0');
+  document.getElementById('clock').textContent=h+':'+m;
+}
+
+// ── WEATHER ──────────────────────────────────────────────────────────────────
+async function fetchWeather(){
+  try{
+    // Ararat, Victoria
+    const url='https://api.open-meteo.com/v1/forecast?latitude=-37.28&longitude=142.92&current=temperature_2m,weathercode&timezone=Australia%2FMelbourne';
+    const res=await fetch(url);
+    const data=await res.json();
+    const temp=Math.round(data.current.temperature_2m);
+    const code=data.current.weathercode;
+    const icons={0:'☀',1:'🌤',2:'⛅',3:'☁',45:'🌫',48:'🌫',51:'🌦',61:'🌧',71:'🌨',80:'🌦',95:'⛈'};
+    const icon=icons[code]||icons[Math.floor(code/10)*10]||'🌡';
+    document.getElementById('weather-icon').textContent=icon;
+    document.getElementById('weather-temp').textContent=temp+'°C';
+  }catch(e){}
+}
+
+// ── SYNC STATUS ───────────────────────────────────────────────────────────────
+function setSyncStatus(state){
+  const dot=document.getElementById('sync-dot');
+  const label=document.getElementById('sync-label');
+  dot.className='sync-dot';
+  if(state==='synced'){dot.classList.add('synced');label.textContent='Saved to cloud';}
+  else if(state==='syncing'){dot.classList.add('syncing');label.textContent='Syncing…';}
+  else{dot.classList.add('offline');label.textContent='Offline — saved locally';}
+}
+
+// ── MODULES ───────────────────────────────────────────────────────────────────
+const MODULES=[
+  {icon:'🗓',name:'The Day',desc:'Calendar & tasks',active:false},
+  {icon:'🫂',name:'The Circle',desc:'Relationships',active:false},
+  {icon:'🤝',name:'The Partnership',desc:'Shared care',active:false},
+  {icon:'📥',name:'The Decks',desc:'Digital death-clean',active:false},
+  {icon:'💓',name:'The Body',desc:'Health monitor',active:false},
+  {icon:'✍️',name:'The Work',desc:'Writing & teaching',active:false},
+  {icon:'🧘',name:'The Mind',desc:'Journal & meditation',active:false},
+  {icon:'📚',name:'The Life',desc:'Reading & research',active:false},
+];
+
+function renderModules(){
+  const grid=document.getElementById('modules-grid');
+  grid.innerHTML='';
+  MODULES.forEach(m=>{
+    const div=document.createElement('div');
+    div.className='module coming-soon';
+    div.innerHTML=`
+      <div class="module-icon">${m.icon}</div>
+      <div class="module-name">${m.name}</div>
+      <div class="module-desc">${m.desc}</div>`;
+    grid.appendChild(div);
+  });
+}
+
+// ── SERVICE WORKER ────────────────────────────────────────────────────────────
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/sw.js').catch(()=>{});
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+document.getElementById('dateline').textContent=formatDate();
+updateClock();
+setInterval(updateClock,30000);
+fetchWeather();
+setInterval(fetchWeather,600000);
+loadPriorities();
+loadQuoteIndex();
+renderQuote();
+renderModules();
+setSyncStatus('offline');
+</script>
+</body>
+</html>
